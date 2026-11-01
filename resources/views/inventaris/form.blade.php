@@ -1,0 +1,18 @@
+@extends('layouts.app')
+@section('title',$item->exists?'Edit Barang':'Tambah Barang')
+@section('content')
+<div class="heading-row"><div><div class="kicker">INVENTARIS / FORMULIR</div><h1>{{ $item->exists?'Edit Barang Inventaris':'Tambah Barang Inventaris' }}</h1><p>Satu entri barang mencatat satu jenis barang dengan jumlah unit pada satu lokasi.</p></div><a href="{{ $item->exists?route('inventaris.show',$item):route('inventaris.index') }}" class="btn">← Kembali</a></div>
+@if($item->exists)<div class="info-banner"><strong>Catatan mutasi:</strong> untuk memindahkan barang antar-ruang, buka halaman detail dan gunakan fitur mutasi agar perpindahan terekam.</div>@endif
+<form method="POST" action="{{ $item->exists?route('inventaris.update',$item):route('inventaris.store') }}">@csrf @if($item->exists)@method('PUT')@endif
+<div class="card"><h2>Identitas dan Penempatan Barang</h2><div class="form-grid">
+<div class="field"><label for="kode">Kode Barang *</label><input id="kode" class="control" name="kode" value="{{ old('kode',$item->kode) }}" placeholder="AST-001" maxlength="35" required></div>
+<div class="field"><label for="nama">Nama Barang *</label><input id="nama" class="control" name="nama" value="{{ old('nama',$item->nama) }}" placeholder="Meja Siswa" required></div>
+<div class="field"><label for="lokasi">Lokasi / Prasarana</label><select id="lokasi" class="control" name="prasarana_id" {{ $item->exists?'disabled':'' }}><option value="">Belum ditentukan</option>@foreach($lokasi as $x)<option value="{{ $x->id }}" @selected((string)old('prasarana_id',$item->prasarana_id??request('prasarana_id'))===(string)$x->id)>{{ $x->kode }} — {{ $x->nama }}</option>@endforeach</select>@if($item->exists)<input type="hidden" name="prasarana_id" value="{{ $item->prasarana_id }}"><span class="hint">Lokasi hanya bisa diubah melalui mutasi pada detail barang.</span>@endif</div>
+<div class="field"><label for="jumlah">Jumlah Unit *</label><input id="jumlah" class="control" type="number" name="jumlah" value="{{ old('jumlah',$item->jumlah??1) }}" min="1" required></div>
+<div class="field"><label for="kondisi">Kondisi Barang *</label><select id="kondisi" class="control" name="kondisi">@foreach(['baik'=>'Baik','rusak_ringan'=>'Rusak Ringan','rusak_berat'=>'Rusak Berat','hilang'=>'Hilang'] as $v=>$n)<option value="{{ $v }}" @selected(old('kondisi',$item->kondisi??'baik')===$v)>{{ $n }}</option>@endforeach</select></div>
+<div class="field"><label for="tahun">Tahun Perolehan</label><input id="tahun" class="control" type="number" min="1900" max="2100" name="tahun_perolehan" value="{{ old('tahun_perolehan',$item->tahun_perolehan) }}" placeholder="2026"></div>
+<div class="field span-2"><label for="ket">Keterangan</label><textarea id="ket" class="control" name="keterangan" placeholder="Keterangan tambahan terkait inventaris...">{{ old('keterangan',$item->keterangan) }}</textarea></div>
+<div class="span-2"><label class="checkrow"><input type="checkbox" name="is_dummy" value="1" @checked(old('is_dummy',$item->is_dummy))> Tandai sebagai data dummy, belum diverifikasi di lapangan</label></div>
+</div><div class="form-actions"><a href="{{ route('inventaris.index') }}" class="btn">Batal</a><button type="submit" class="btn btn-primary">Simpan Barang</button></div></div></form>
+@if($item->exists && auth()->user()->canEdit())<div class="danger-zone"><h3>Hapus Barang</h3><p>Tindakan ini juga menghapus catatan mutasi dan pemeliharaan barang tersebut.</p><form method="POST" action="{{ route('inventaris.destroy',$item) }}" onsubmit="return confirm('Hapus barang dan seluruh riwayatnya?')">@csrf @method('DELETE')<button class="btn btn-danger">Hapus Barang</button></form></div>@endif
+@endsection

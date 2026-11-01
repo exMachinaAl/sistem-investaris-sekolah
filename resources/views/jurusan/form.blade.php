@@ -1,0 +1,8 @@
+@extends('layouts.app')
+@section('title',$item->exists?'Edit Jurusan':'Tambah Jurusan')
+@section('content')
+<div class="heading-row"><div><div class="kicker">MASTER DATA / JURUSAN</div><h1>{{ $item->exists?'Edit Jurusan':'Tambah Jurusan' }}</h1><p>Jurusan dapat memiliki banyak ruangan, dan satu ruang dapat digunakan lintas jurusan.</p></div><a class="btn" href="{{ route('jurusan.index') }}">← Kembali</a></div>
+<form method="POST" action="{{ $item->exists?route('jurusan.update',$item):route('jurusan.store') }}">@csrf @if($item->exists)@method('PUT')@endif
+<div class="card"><h2>Informasi Jurusan</h2><div class="form-grid"><div class="field"><label for="kode">Kode Jurusan *</label><input id="kode" class="control" name="kode" value="{{ old('kode',$item->kode) }}" maxlength="30" placeholder="Contoh: TKJ" required></div><div class="field"><label for="nama">Nama Jurusan *</label><input id="nama" class="control" name="nama" value="{{ old('nama',$item->nama) }}" required></div><div class="span-2"><label class="checkrow"><input type="checkbox" name="is_dummy" value="1" {{ old('is_dummy',$item->is_dummy)?'checked':'' }}> Tandai sebagai data dummy (perlu diverifikasi)</label></div></div><div class="form-actions"><a href="{{ route('jurusan.index') }}" class="btn">Batal</a><button class="btn btn-primary">Simpan Jurusan</button></div></div></form>
+@if($item->exists && auth()->user()->canEdit())<div class="danger-zone"><h3>Hapus Jurusan</h3><p>Hanya dapat dihapus jika tidak terhubung ke prasarana.</p><form method="POST" action="{{ route('jurusan.destroy',$item) }}" onsubmit="return confirm('Yakin ingin menghapus jurusan?')">@csrf @method('DELETE')<button class="btn btn-danger">Hapus Jurusan</button></form></div>@endif
+@endsection

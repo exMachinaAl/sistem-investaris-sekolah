@@ -1,0 +1,32 @@
+PANDUAN CEPAT - LARAGON + MYSQL - SISTEM INVENTARIS SEKOLAH
+
+1. EKSTRAK ZIP ke C:\laragon\www\sistem-inventaris-sekolah
+2. Buka Laragon, klik START ALL
+3. Buka TERMINAL Laragon lalu:
+
+   cd C:\laragon\www\sistem-inventaris-sekolah
+   composer install
+   copy .env.example .env
+
+4. BUKA .env, cek DB_DATABASE=sistem_inventaris_sekolah,
+   DB_USERNAME=root, DB_PASSWORD= (sesuaikan dengan MySQL Laragon)
+   ISI SEED_ADMIN_PASSWORD dengan password pribadi minimal 12 karakter.
+
+5. BUAT database bernama sistem_inventaris_sekolah di HeidiSQL
+6. JALANKAN:
+
+   php artisan key:generate
+   php artisan migrate
+   php artisan db:seed
+   php artisan serve
+
+7. Buka http://127.0.0.1:8000/login
+8. Login dengan email dan password yang Anda isi di .env
+
+OPSIONAL untuk mengisi data GEDUNG/JURUSAN/BARANG CONTOH:
+   php artisan db:seed --class=DemoSeeder
+
+CATATAN: 148 PRASARANA DARI XLS DIMUAT OLEH db:seed.
+FILE ZIP TANPA vendor/ sehingga composer install WAJIB.
+JANGAN JALANKAN php artisan migrate:fresh JIKA DATA SUDAH ADA.
+Panduan lengkap ada di README.md.

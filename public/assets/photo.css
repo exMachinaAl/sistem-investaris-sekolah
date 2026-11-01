@@ -1,0 +1,54 @@
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+    gap: 18px;
+    padding: 22px;
+}
+.photo-card {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    background: #fff;
+}
+.photo-card > a {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: #eef2f7;
+}
+.photo-card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .2s;
+}
+.photo-card > a:hover img { transform: scale(1.025); }
+.photo-meta { padding: 15px; }
+.photo-meta-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.photo-meta p { margin: 8px 0; }
+.photo-empty { border-bottom: 1px solid var(--line); }
+.photo-upload {
+    padding: 23px;
+    border-top: 1px solid var(--line);
+    background: #fbfcff;
+}
+.photo-upload > div > h3 { margin-bottom: 5px; }
+.photo-upload > div > p { margin-bottom: 18px; }
+.photo-upload input[type=file] {
+    padding: 8px;
+    background: white;
+}
+@media (max-width: 580px) {
+    .photo-grid {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+    .photo-upload { padding: 18px; }
+}

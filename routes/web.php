@@ -1,0 +1,73 @@
+<?php
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GedungController;
+use App\Http\Controllers\JurusanController;
+use App\Http\Controllers\PrasaranaController;
+use App\Http\Controllers\InventarisController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\ImportController;
+use App\Http\Controllers\DokumentasiFotoController;
+use App\Http\Controllers\DokumentasiController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/',fn()=>redirect()->route('dashboard'));
+Route::middleware('guest')->group(function(){
+    Route::get('/login',[AuthController::class,'show'])->name('login');
+    Route::post('/login',[AuthController::class,'login'])->middleware('throttle:5,1')->name('login.process');
+});
+Route::middleware('auth')->group(function(){
+    Route::post('/logout',[AuthController::class,'logout'])->name('logout');
+    Route::get('/dashboard',DashboardController::class)->name('dashboard');
+    Route::get('/gedung',[GedungController::class,'index'])->name('gedung.index');
+    Route::get('/gedung/{gedung}',[GedungController::class,'show'])->whereNumber('gedung')->name('gedung.show');
+    Route::get('/jurusan',[JurusanController::class,'index'])->name('jurusan.index');
+    Route::get('/jurusan/{jurusan}',[JurusanController::class,'show'])->whereNumber('jurusan')->name('jurusan.show');
+    Route::get('/prasarana',[PrasaranaController::class,'index'])->name('prasarana.index');
+    Route::get('/prasarana/{prasarana}',[PrasaranaController::class,'show'])->whereNumber('prasarana')->name('prasarana.show');
+    Route::get('/inventaris',[InventarisController::class,'index'])->name('inventaris.index');
+    Route::get('/inventaris/arsip',[InventarisController::class,'arsip'])->middleware('admin')->name('inventaris.arsip');
+    Route::post('/inventaris/arsip/{inventaris}/pulihkan',[InventarisController::class,'pulihkan'])->middleware('admin')->whereNumber('inventaris')->name('inventaris.pulihkan');
+    Route::get('/inventaris/{inventaris}',[InventarisController::class,'show'])->whereNumber('inventaris')->name('inventaris.show');
+    Route::get('/laporan',[LaporanController::class,'index'])->name('laporan.index');
+    Route::get('/laporan/export/{jenis}',[LaporanController::class,'export'])->whereIn('jenis',['gedung','jurusan','prasarana','inventaris'])->name('laporan.export');
+    Route::get('/dokumentasi-foto/{foto}',[DokumentasiFotoController::class,'show'])->whereNumber('foto')->name('dokumentasi-foto.show');
+    Route::get('/dokumentasi',[DokumentasiController::class,'index'])->name('dokumentasi.index');
+    Route::middleware('editor')->group(function(){
+        Route::get('/gedung/tambah',[GedungController::class,'create'])->name('gedung.create');
+        Route::post('/gedung',[GedungController::class,'store'])->name('gedung.store');
+        Route::get('/gedung/{gedung}/edit',[GedungController::class,'edit'])->name('gedung.edit');
+        Route::put('/gedung/{gedung}',[GedungController::class,'update'])->name('gedung.update');
+        Route::delete('/gedung/{gedung}',[GedungController::class,'destroy'])->name('gedung.destroy');
+        Route::get('/jurusan/tambah',[JurusanController::class,'create'])->name('jurusan.create');
+        Route::post('/jurusan',[JurusanController::class,'store'])->name('jurusan.store');
+        Route::get('/jurusan/{jurusan}/edit',[JurusanController::class,'edit'])->name('jurusan.edit');
+        Route::put('/jurusan/{jurusan}',[JurusanController::class,'update'])->name('jurusan.update');
+        Route::delete('/jurusan/{jurusan}',[JurusanController::class,'destroy'])->name('jurusan.destroy');
+        Route::get('/prasarana/tambah',[PrasaranaController::class,'create'])->name('prasarana.create');
+        Route::post('/prasarana',[PrasaranaController::class,'store'])->name('prasarana.store');
+        Route::get('/prasarana/{prasarana}/edit',[PrasaranaController::class,'edit'])->name('prasarana.edit');
+        Route::put('/prasarana/{prasarana}',[PrasaranaController::class,'update'])->name('prasarana.update');
+        Route::delete('/prasarana/{prasarana}',[PrasaranaController::class,'destroy'])->name('prasarana.destroy');
+        Route::post('/prasarana/{prasarana}/foto',[PrasaranaController::class,'storeFoto'])->name('prasarana.foto.store');
+        Route::delete('/prasarana/{prasarana}/foto/{foto}',[PrasaranaController::class,'destroyFoto'])->name('prasarana.foto.destroy');
+        Route::get('/inventaris/tambah',[InventarisController::class,'create'])->name('inventaris.create');
+        Route::post('/inventaris',[InventarisController::class,'store'])->name('inventaris.store');
+        Route::get('/inventaris/{inventaris}/edit',[InventarisController::class,'edit'])->name('inventaris.edit');
+        Route::put('/inventaris/{inventaris}',[InventarisController::class,'update'])->name('inventaris.update');
+        Route::delete('/inventaris/{inventaris}',[InventarisController::class,'destroy'])->name('inventaris.destroy');
+        Route::post('/inventaris/{inventaris}/mutasi',[InventarisController::class,'mutasi'])->name('inventaris.mutasi');
+        Route::post('/inventaris/{inventaris}/pemeliharaan',[InventarisController::class,'pemeliharaan'])->name('inventaris.pemeliharaan');
+        Route::post('/inventaris/{inventaris}/foto',[InventarisController::class,'storeFoto'])->name('inventaris.foto.store');
+        Route::delete('/inventaris/{inventaris}/foto/{foto}',[InventarisController::class,'destroyFoto'])->name('inventaris.foto.destroy');
+        Route::middleware('admin')->group(function(){
+            Route::get('/import',[ImportController::class,'index'])->name('import.index');
+            Route::get('/import/template/{jenis}',[ImportController::class,'template'])->whereIn('jenis',['gedung','jurusan','prasarana','inventaris'])->name('import.template');
+            Route::post('/import/gedung',[ImportController::class,'gedung'])->name('import.gedung');
+            Route::post('/import/jurusan',[ImportController::class,'jurusan'])->name('import.jurusan');
+            Route::post('/import/prasarana',[ImportController::class,'prasarana'])->name('import.prasarana');
+            Route::post('/import/inventaris',[ImportController::class,'inventaris'])->name('import.inventaris');
+            Route::post('/import/prasarana/konfirmasi',[ImportController::class,'konfirmasi'])->name('import.konfirmasi');
+        });
+    });
+});
