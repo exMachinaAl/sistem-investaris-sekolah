@@ -91,18 +91,22 @@ Laragon dapat mengenali `sistem-inventaris-sekolah.test` jika fitur Auto Virtual
 | Halaman | Kemampuan |
 |---|---|
 | Dashboard | jumlah gedung, prasarana, jurusan, unit barang, belum dipetakan, kategori dan kondisi |
-| Data Gedung | CRUD, jumlah lantai, daftar prasarana di gedung |
+| Data Gedung | CRUD, jumlah lantai, ukuran dan luas tapak, status pengukuran, daftar prasarana di gedung |
 | Data Jurusan | CRUD, daftar fasilitas pengguna, relasi ruangan dapat untuk banyak jurusan |
 | Ruang & Prasarana | CRUD, gedung/lantai/ukuran, verifikasi, filter, daftar inventaris per ruang |
 | Inventaris Barang | CRUD, unit, kondisi, tahun perolehan, lokasi |
 | Detail Inventaris | mutasi **seluruh** unit pada entri inventaris dan catatan pemeliharaan |
 | Dokumentasi Foto | foto ruang dan barang, tanggal, kategori bukti, jumlah terverifikasi, serta keterangan |
+| FAQ & Petunjuk | pusat bantuan yang dapat dicari serta tombol bantuan kontekstual pada menu, form, filter, dan tindakan penting |
 | Laporan | rekap per gedung dan jurusan, ekspor CSV ke Excel |
 | Impor CSV | unduh template lalu tambah/perbarui gedung, jurusan, prasarana, atau inventaris berdasarkan kode; dilengkapi validasi, pratinjau, dan konfirmasi |
 | Login/role | admin & petugas boleh ubah; pimpinan hanya lihat/unduh laporan |
 
 ### Catatan penting
 
+- Kode internal gedung, jurusan, prasarana, dan inventaris dibuat otomatis ketika data ditambahkan melalui formulir. Kode yang disediakan melalui impor CSV tetap dipertahankan untuk kompatibilitas data lama dan integrasi.
+- Ukuran gedung adalah ukuran tapak keseluruhan. Luas tapak dihitung dari panjang × lebar dan tidak dianggap sebagai luas total seluruh lantai.
+- Tombol bantuan berbentuk tanda tanya dapat dibuka dengan klik/ketuk atau dengan mengarahkan kursor sebentar. Menu FAQ menyediakan pencarian panduan lengkap; tombol bantuan juga dapat dioperasikan dengan keyboard dan ditutup menggunakan tombol Esc.
 - **Akun default tidak memiliki password bawaan.** Akun admin dibuat dari `.env` ketika menjalankan `php artisan db:seed`.
 - Akun `petugas` / `pimpinan` dapat ditambahkan oleh pengembang melalui Eloquent/Tinker karena MVP ini belum menyediakan antarmuka pengelolaan user. Misalnya:
 
@@ -174,5 +178,5 @@ Bila ekstensi `pdo_sqlite` aktif di PHP Laragon, jalankan:
 php artisan test
 ```
 
-Empat tes fitur dasar disediakan di `tests/Feature/SarprasFeatureTest.php`: akses login, tambah gedung/prasarana, hak baca pimpinan, dan unduh CSV. Ini **belum** menggantikan pengujian langsung Laravel dan MySQL pada Laragon Anda.
+Suite tes fitur mencakup akses, CRUD utama, kode otomatis, ukuran gedung, validasi lantai, dokumentasi foto, arsip, serta impor/ekspor CSV. Ini **belum** menggantikan pengujian langsung Laravel dan MySQL pada Laragon Anda.
 # sistem-investaris-sekolah

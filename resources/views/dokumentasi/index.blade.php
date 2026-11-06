@@ -4,11 +4,11 @@
 <div class="heading-row">
     <div>
         <div class="kicker">VERIFIKASI LAPANGAN</div>
-        <h1>Dokumentasi Foto</h1>
+        <div class="section-title-help"><h1>Dokumentasi Foto</h1><x-help-tip text="Halaman ini memprioritaskan ruang dan barang yang belum memiliki bukti visual." /></div>
         <p>Lengkapi bukti kondisi ruang terlebih dahulu, kemudian dokumentasikan jumlah dan ketersediaan barang.</p>
     </div>
     <div class="heading-actions">
-        <a href="{{ route('prasarana.index') }}" class="btn btn-primary">Pilih Ruangan untuk Difoto</a>
+        <span class="action-help"><a href="{{ route('prasarana.index') }}" class="btn btn-primary">Pilih Ruangan untuk Difoto</a><x-help-tip text="Pilih ruang, buka detailnya, lalu gunakan bagian Tambah Foto Ruangan." /></span>
         <a href="{{ route('inventaris.index') }}" class="btn">Pilih Barang</a>
     </div>
 </div>
@@ -24,7 +24,7 @@
 </div>
 
 <section class="section-card">
-    <div class="card-header"><h2>Prioritas Dokumentasi Ruangan</h2><span class="small muted">Ruang tanpa foto ditampilkan lebih dahulu</span></div>
+    <div class="card-header"><div class="section-title-help"><h2>Prioritas Dokumentasi Ruangan</h2><x-help-tip text="Ruang tanpa foto berada di urutan awal agar proses verifikasi lapangan lebih terarah." /></div><span class="small muted">Ruang tanpa foto ditampilkan lebih dahulu</span></div>
     <div class="table-scroll"><table>
         <thead><tr><th>Kode</th><th>Ruangan / Prasarana</th><th>Gedung</th><th>Dokumentasi</th><th>Aksi</th></tr></thead>
         <tbody>@forelse($ruang as $item)<tr>
@@ -39,7 +39,7 @@
 </section>
 
 <section class="section-card" style="margin-top:23px">
-    <div class="card-header"><h2>Dokumentasi Inventaris Barang</h2><span class="small muted">Barang tanpa foto ditampilkan lebih dahulu</span></div>
+    <div class="card-header"><div class="section-title-help"><h2>Dokumentasi Inventaris Barang</h2><x-help-tip text="Gunakan foto jumlah barang untuk membandingkan stok fisik dengan jumlah yang tercatat." /></div><span class="small muted">Barang tanpa foto ditampilkan lebih dahulu</span></div>
     <div class="table-scroll"><table>
         <thead><tr><th>Kode</th><th>Barang</th><th>Lokasi</th><th>Jumlah</th><th>Dokumentasi</th><th>Aksi</th></tr></thead>
         <tbody>@forelse($barang as $item)<tr>

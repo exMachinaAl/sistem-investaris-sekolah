@@ -5,7 +5,7 @@
 <div class="heading-row">
     <div>
         <div class="kicker">PENGELOLAAN DATA • KHUSUS ADMIN</div>
-        <h1>{{ $activeType ? 'Pratinjau Impor '.$activeType['label'] : 'Impor Data dari CSV' }}</h1>
+        <div class="section-title-help"><h1>{{ $activeType ? 'Pratinjau Impor '.$activeType['label'] : 'Impor Data dari CSV' }}</h1><x-help-tip text="Impor menggunakan dua tahap: validasi dan pratinjau terlebih dahulu, baru penyimpanan setelah admin mengonfirmasi." /></div>
         <p>Unduh template sesuai jenis data, isi tanpa mengubah nama kolom, lalu unggah untuk diperiksa.</p>
     </div>
     <div class="heading-actions">
@@ -26,7 +26,7 @@
 </div>
 <div class="section-card">
     <div class="card-header">
-        <h2>Pratinjau {{ $activeType['label'] }}</h2>
+        <div class="section-title-help"><h2>Pratinjau {{ $activeType['label'] }}</h2><x-help-tip text="Periksa status Tambah, Perbarui, atau Tidak berubah. Maksimal 50 baris ditampilkan, tetapi seluruh file tetap divalidasi." /></div>
         <span class="small muted">Maksimal 50 baris pertama ditampilkan</span>
     </div>
     <div class="table-scroll"><table>
@@ -40,9 +40,9 @@
     <div class="card-body">
         <form method="POST" action="{{ route('import.konfirmasi') }}">@csrf
             <input type="hidden" name="token" value="{{ $token }}">
-            <label><input type="checkbox" name="setuju" value="1" required> Saya sudah memeriksa ringkasan dan menyetujui penambahan/perubahan data.</label>
+            <div class="field-label-row"><label><input type="checkbox" name="setuju" value="1" required> Saya sudah memeriksa ringkasan dan menyetujui penambahan/perubahan data.</label><x-help-tip text="Centang hanya setelah kode, nama, dan jumlah perubahan pada pratinjau sudah diperiksa." /></div>
             <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
-                <button class="btn btn-primary">Konfirmasi &amp; Simpan Perubahan</button>
+                <span class="action-help"><button class="btn btn-primary">Konfirmasi &amp; Simpan Perubahan</button><x-help-tip text="Tindakan ini baru menulis seluruh perubahan yang lolos validasi ke database secara atomik." /></span>
                 <a href="{{ route('import.index') }}" class="btn">Batal, jangan simpan</a>
             </div>
         </form>
@@ -57,24 +57,24 @@
 @foreach($importTypes as $key=>$type)
     <div class="card">
         <div class="card-header" style="padding:0 0 16px">
-            <div><h2 style="margin-bottom:5px">{{ $type['label'] }}</h2><p style="margin:0">{{ $type['description'] }}</p></div>
+            <div><div class="section-title-help"><h2 style="margin-bottom:5px">{{ $type['label'] }}</h2><x-help-tip text="Gunakan template khusus jenis data ini. Jangan mengganti nama kolom pada baris pertama." /></div><p style="margin:0">{{ $type['description'] }}</p></div>
         </div>
         <p class="small"><b>Kolom wajib:</b> {{ implode(', ', $type['required']) }}</p>
         <p class="small muted" style="word-break:break-word"><b>Semua kolom:</b> {{ implode(', ', $type['headers']) }}</p>
         <a class="btn btn-light" href="{{ route('import.template',$key) }}">⇩ Unduh Template {{ $type['label'] }}</a>
         <form method="POST" action="{{ route('import.'.$key) }}" enctype="multipart/form-data">@csrf
             <div class="field" style="margin-top:18px">
-                <label for="file-{{ $key }}">Unggah CSV {{ $type['label'] }} *</label>
+                <div class="field-label-row"><label for="file-{{ $key }}">Unggah CSV {{ $type['label'] }} *</label><x-help-tip text="Pilih CSV UTF-8 dari template {{ $type['label'] }}. File jenis lain atau header yang tidak dikenal akan ditolak." /></div>
                 <input id="file-{{ $key }}" class="control" type="file" name="file" accept=".csv,.txt,text/csv" required>
                 <span class="hint">CSV UTF-8, maksimal 4 MB dan 1.000 baris.</span>
             </div>
-            <button type="submit" class="btn btn-primary" style="margin-top:16px">Periksa &amp; Pratinjau →</button>
+            <div class="action-help" style="margin-top:16px"><button type="submit" class="btn btn-primary">Periksa &amp; Pratinjau →</button><x-help-tip text="Tahap ini hanya memeriksa file dan belum mengubah database." /></div>
         </form>
     </div>
 @endforeach
 </div>
 <div class="section-card" style="margin-top:20px">
-    <div class="card-header"><h2>Aturan Penting</h2></div>
+    <div class="card-header"><div class="section-title-help"><h2>Aturan Penting</h2><x-help-tip text="Baca aturan nilai pilihan dan referensi sebelum mengisi banyak baris agar impor tidak gagal." /></div></div>
     <div class="card-body">
         <p>Kode yang belum ada akan ditambahkan; kode yang sudah ada akan diperbarui hanya pada kolom yang disertakan. Tidak ada perubahan sebelum tombol konfirmasi ditekan.</p>
         <p><b>Nilai pilihan:</b> kondisi inventaris = <span class="code">baik</span>, <span class="code">rusak_ringan</span>, <span class="code">rusak_berat</span>, atau <span class="code">hilang</span>. Status prasarana = <span class="code">belum</span>, <span class="code">terverifikasi</span>, atau <span class="code">perlu_koreksi</span>.</p>

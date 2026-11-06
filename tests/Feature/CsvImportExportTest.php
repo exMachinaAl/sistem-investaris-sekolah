@@ -35,7 +35,7 @@ class CsvImportExportTest extends TestCase {
     public function test_admin_dapat_mengunduh_template_semua_jenis_data(): void {
         $this->actingAs($this->admin());
         foreach([
-            'gedung'=>'kode;nama;jumlah_lantai;keterangan;is_dummy',
+            'gedung'=>'kode;nama;jumlah_lantai;panjang;lebar;status_verifikasi;tanggal_pengukuran;sumber_ukuran;keterangan;is_dummy',
             'jurusan'=>'kode;nama;is_dummy',
             'prasarana'=>'kode;nama;kategori_sementara;panjang;lebar;gedung_kode',
             'inventaris'=>'kode;nama;lokasi_kode;jumlah;kondisi;tahun_perolehan',
@@ -48,12 +48,12 @@ class CsvImportExportTest extends TestCase {
 
     public function test_import_empat_jenis_data_menggunakan_template_dan_konfirmasi(): void {
         $this->actingAs($this->admin());
-        $this->confirmPreview('import.gedung',"kode;nama;jumlah_lantai\nGD-CSV;Gedung CSV;3\n");
+        $this->confirmPreview('import.gedung',"kode;nama;jumlah_lantai;panjang;lebar;status_verifikasi\nGD-CSV;Gedung CSV;3;24;10;terverifikasi\n");
         $this->confirmPreview('import.jurusan',"kode,nama\nJRS-CSV,Jurusan CSV\n");
         $this->confirmPreview('import.prasarana',"kode;nama;gedung_kode;status_verifikasi\nPRS-CSV;Ruang CSV;GD-CSV;terverifikasi\n");
         $this->confirmPreview('import.inventaris',"kode;nama;lokasi_kode;jumlah;kondisi;tahun_perolehan\nINV-CSV;Laptop CSV;PRS-CSV;5;baik;2026\n");
 
-        $this->assertDatabaseHas('gedung',['kode'=>'GD-CSV','jumlah_lantai'=>3]);
+        $this->assertDatabaseHas('gedung',['kode'=>'GD-CSV','jumlah_lantai'=>3,'panjang'=>24,'lebar'=>10,'status_verifikasi'=>'terverifikasi']);
         $this->assertDatabaseHas('jurusan',['kode'=>'JRS-CSV','nama'=>'Jurusan CSV']);
         $ruang=Prasarana::where('kode','PRS-CSV')->firstOrFail();
         $this->assertDatabaseHas('inventaris',[

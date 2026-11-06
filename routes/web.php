@@ -19,6 +19,7 @@ Route::middleware('guest')->group(function(){
 Route::middleware('auth')->group(function(){
     Route::post('/logout',[AuthController::class,'logout'])->name('logout');
     Route::get('/dashboard',DashboardController::class)->name('dashboard');
+    Route::view('/faq','faq.index')->name('faq.index');
     Route::get('/gedung',[GedungController::class,'index'])->name('gedung.index');
     Route::get('/gedung/{gedung}',[GedungController::class,'show'])->whereNumber('gedung')->name('gedung.show');
     Route::get('/jurusan',[JurusanController::class,'index'])->name('jurusan.index');

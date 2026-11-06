@@ -136,9 +136,9 @@ class ImportController {
     private function importTypes(): array {
         return [
             'gedung'=>[
-                'label'=>'Gedung','description'=>'Data gedung dan jumlah lantai.',
-                'headers'=>['kode','nama','jumlah_lantai','keterangan','is_dummy'],
-                'example'=>['GD-CONTOH-001','Gedung Contoh','2','Hapus baris contoh ini sebelum impor','0'],
+                'label'=>'Gedung','description'=>'Data gedung, jumlah lantai, dan ukuran tapaknya.',
+                'headers'=>['kode','nama','jumlah_lantai','panjang','lebar','status_verifikasi','tanggal_pengukuran','sumber_ukuran','keterangan','is_dummy'],
+                'example'=>['GD-CONTOH-001','Gedung Contoh','2','30','12','belum','','Pengukuran lapangan','Hapus baris contoh ini sebelum impor','0'],
                 'required'=>['kode','nama'],
             ],
             'jurusan'=>[
@@ -237,12 +237,17 @@ class ImportController {
     private function validateRow(array $raw,string $jenis,int $line): array {
         $common=[
             'kode'=>['required','string','max:'.($jenis==='inventaris'?35:30)],
-            'nama'=>['required','string','max:255'],
+            'nama'=>['required','string','max:'.(in_array($jenis,['gedung','jurusan'],true)?160:255)],
             'is_dummy'=>['sometimes','nullable',Rule::in(['0','1','ya','tidak','true','false'])],
         ];
         $rules=match($jenis){
             'gedung'=>$common+[
                 'jumlah_lantai'=>['sometimes','nullable','integer','min:1','max:100'],
+                'panjang'=>['sometimes','nullable','required_with:lebar','numeric','gt:0','max:999999'],
+                'lebar'=>['sometimes','nullable','required_with:panjang','numeric','gt:0','max:999999'],
+                'status_verifikasi'=>['sometimes','nullable',Rule::in(['belum','terverifikasi','perlu_koreksi'])],
+                'tanggal_pengukuran'=>['sometimes','nullable','date','before_or_equal:today'],
+                'sumber_ukuran'=>['sometimes','nullable','string','max:200'],
                 'keterangan'=>['sometimes','nullable','string','max:10000'],
             ],
             'jurusan'=>$common,
@@ -278,11 +283,30 @@ class ImportController {
     }
 
     private function resolveRelations(array $row,string $jenis,int $line): array {
+        if($jenis==='gedung' && ($row['jumlah_lantai']??null)!==null){
+            $gedung=Gedung::where('kode',$row['kode'])->first();
+            $lantaiTertinggi=$gedung?->prasarana()->max('lantai');
+            if($lantaiTertinggi!==null && (int)$row['jumlah_lantai']<(int)$lantaiTertinggi){
+                throw ValidationException::withMessages(['file'=>"Baris $line: jumlah lantai tidak boleh lebih kecil dari lantai ruang tertinggi yang sudah tercatat (lantai $lantaiTertinggi)."]);
+            }
+        }
         if($jenis==='prasarana' && array_key_exists('gedung_kode',$row)){
             $kode=$row['gedung_kode'];
             $row['gedung_id']=$kode===null?null:Gedung::where('kode',$kode)->value('id');
             if($kode!==null && !$row['gedung_id'])throw ValidationException::withMessages(['file'=>"Baris $line: kode gedung tidak dikenal: $kode."]);
             unset($row['gedung_kode']);
+        }
+        if($jenis==='prasarana'){
+            $existing=Prasarana::where('kode',$row['kode'])->first(['gedung_id','lantai']);
+            $gedungId=array_key_exists('gedung_id',$row)?$row['gedung_id']:$existing?->gedung_id;
+            $lantai=array_key_exists('lantai',$row)?$row['lantai']:$existing?->lantai;
+            if($lantai!==null && $gedungId===null){
+                throw ValidationException::withMessages(['file'=>"Baris $line: lantai hanya dapat diisi jika kode gedung juga diisi."]);
+            }
+            $jumlahLantai=$gedungId===null?null:Gedung::whereKey($gedungId)->value('jumlah_lantai');
+            if($jumlahLantai!==null && $lantai!==null && (int)$lantai>(int)$jumlahLantai){
+                throw ValidationException::withMessages(['file'=>"Baris $line: lantai ruang melebihi jumlah lantai gedung ($jumlahLantai)."]);
+            }
         }
         if($jenis==='inventaris' && array_key_exists('lokasi_kode',$row)){
             $kode=$row['lokasi_kode'];

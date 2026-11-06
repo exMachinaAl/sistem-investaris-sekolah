@@ -27,8 +27,7 @@ class InventarisController {
     public function edit(Inventaris $inventaris){return $this->form($inventaris);}
     private function form(Inventaris $item){$lokasi=Prasarana::orderBy('nama')->get();return view('inventaris.form',compact('item','lokasi'));}
     private function rules(?Inventaris $item=null):array{
-        return ['kode'=>['required','string','max:35',Rule::unique('inventaris','kode')->ignore($item?->id)],
-            'nama'=>['required','string','max:255'],'prasarana_id'=>['nullable','integer','exists:prasarana,id'],
+        return ['nama'=>['required','string','max:255'],'prasarana_id'=>['nullable','integer','exists:prasarana,id'],
             'jumlah'=>['required','integer','min:1','max:100000000'],
             'kondisi'=>['required',Rule::in(['baik','rusak_ringan','rusak_berat','hilang'])],
             'tahun_perolehan'=>['nullable','integer','min:1900','max:2100'],

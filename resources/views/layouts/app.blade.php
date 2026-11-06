@@ -8,18 +8,20 @@
 <aside class="sidebar" id="sideNav">
 <a class="brand" href="{{ route('dashboard') }}"><span class="brand-logo">▦</span><span>SISTEM INVENTARIS<small>SEKOLAH • SARPRAS</small></span></a>
 <div class="nav-label">MENU UTAMA</div>
-<a class="nav-link {{ request()->routeIs('dashboard')?'active':'' }}" href="{{ route('dashboard') }}"><span class="nav-symbol">◫</span> Dashboard</a>
-<a class="nav-link {{ request()->routeIs('gedung.*')?'active':'' }}" href="{{ route('gedung.index') }}"><span class="nav-symbol">▤</span> Data Gedung</a>
-<a class="nav-link {{ request()->routeIs('prasarana.*')?'active':'' }}" href="{{ route('prasarana.index') }}"><span class="nav-symbol">▧</span> Ruang & Prasarana</a>
-<a class="nav-link {{ request()->routeIs('jurusan.*')?'active':'' }}" href="{{ route('jurusan.index') }}"><span class="nav-symbol">◇</span> Data Jurusan</a>
-<a class="nav-link {{ request()->routeIs('inventaris.*')?'active':'' }}" href="{{ route('inventaris.index') }}"><span class="nav-symbol">◈</span> Inventaris Barang</a>
-<a class="nav-link {{ request()->routeIs('dokumentasi.*')?'active':'' }}" href="{{ route('dokumentasi.index') }}"><span class="nav-symbol">▣</span> Dokumentasi Foto</a>
+<div class="nav-entry"><a class="nav-link {{ request()->routeIs('dashboard')?'active':'' }}" href="{{ route('dashboard') }}"><span class="nav-symbol">◫</span> Dashboard</a><x-help-tip label="Petunjuk Dashboard" text="Ringkasan kondisi data gedung, ruang, jurusan, dan inventaris. Gunakan halaman ini untuk menemukan data yang belum dipetakan atau belum diverifikasi." /></div>
+<div class="nav-entry"><a class="nav-link {{ request()->routeIs('gedung.*')?'active':'' }}" href="{{ route('gedung.index') }}"><span class="nav-symbol">▤</span> Data Gedung</a><x-help-tip label="Petunjuk Data Gedung" text="Catat bangunan utama, jumlah lantai, ukuran tapak, dan status pengukurannya sebelum memetakan ruang." /></div>
+<div class="nav-entry"><a class="nav-link {{ request()->routeIs('prasarana.*')?'active':'' }}" href="{{ route('prasarana.index') }}"><span class="nav-symbol">▧</span> Ruang & Prasarana</a><x-help-tip label="Petunjuk Ruang dan Prasarana" text="Kelola kelas, laboratorium, bengkel, lapangan, dan fasilitas lain beserta gedung, lantai, jurusan, ukuran, dan bukti fotonya." /></div>
+<div class="nav-entry"><a class="nav-link {{ request()->routeIs('jurusan.*')?'active':'' }}" href="{{ route('jurusan.index') }}"><span class="nav-symbol">◇</span> Data Jurusan</a><x-help-tip label="Petunjuk Data Jurusan" text="Daftarkan jurusan atau program keahlian. Satu jurusan dapat memakai banyak ruang dan satu ruang dapat dipakai beberapa jurusan." /></div>
+<div class="nav-entry"><a class="nav-link {{ request()->routeIs('inventaris.*')?'active':'' }}" href="{{ route('inventaris.index') }}"><span class="nav-symbol">◈</span> Inventaris Barang</a><x-help-tip label="Petunjuk Inventaris" text="Catat barang per lokasi, jumlah, kondisi, tahun perolehan, mutasi, pemeliharaan, dan dokumentasi bukti." /></div>
+<div class="nav-entry"><a class="nav-link {{ request()->routeIs('dokumentasi.*')?'active':'' }}" href="{{ route('dokumentasi.index') }}"><span class="nav-symbol">▣</span> Dokumentasi Foto</a><x-help-tip label="Petunjuk Dokumentasi Foto" text="Pantau ruang dan inventaris yang sudah atau belum memiliki foto bukti verifikasi." /></div>
 <div class="nav-label">PENGELOLAAN</div>
-<a class="nav-link {{ request()->routeIs('laporan.*')?'active':'' }}" href="{{ route('laporan.index') }}"><span class="nav-symbol">▥</span> Laporan & Ekspor</a>
+<div class="nav-entry"><a class="nav-link {{ request()->routeIs('laporan.*')?'active':'' }}" href="{{ route('laporan.index') }}"><span class="nav-symbol">▥</span> Laporan & Ekspor</a><x-help-tip label="Petunjuk Laporan" text="Lihat rekap data dan unduh CSV untuk pemeriksaan atau pengolahan lanjutan di spreadsheet." /></div>
 @if(auth()->user()->role === 'admin')
-<a class="nav-link {{ request()->routeIs('import.*')?'active':'' }}" href="{{ route('import.index') }}"><span class="nav-symbol">⇧</span> Impor CSV</a>
+<div class="nav-entry"><a class="nav-link {{ request()->routeIs('import.*')?'active':'' }}" href="{{ route('import.index') }}"><span class="nav-symbol">⇧</span> Impor CSV</a><x-help-tip label="Petunjuk Impor CSV" text="Khusus admin. Unduh template, unggah CSV, periksa pratinjau, lalu konfirmasi sebelum data disimpan." /></div>
 @endif
-<div class="side-bottom"><b>Portal Sarpras</b><br>Data gedung, fasilitas, dan inventaris sekolah.<br><br><span style="color:#90a8c9">Versi 1.1 • Data Guard</span></div>
+<div class="nav-label">BANTUAN</div>
+<div class="nav-entry"><a class="nav-link {{ request()->routeIs('faq.*')?'active':'' }}" href="{{ route('faq.index') }}"><span class="nav-symbol">?</span> FAQ & Petunjuk</a><x-help-tip label="Petunjuk pusat bantuan" text="Buka kumpulan pertanyaan umum dan panduan penggunaan seluruh modul aplikasi." /></div>
+<div class="side-bottom"><b>Portal Sarpras</b><br>Data gedung, fasilitas, dan inventaris sekolah.<br><br><span style="color:#90a8c9">Versi 1.2 • Context Help</span></div>
 </aside>
 <div class="main">
 <header class="topbar"><div style="display:flex;gap:12px;align-items:center"><button type="button" class="mobile-menu" onclick="document.body.classList.toggle('nav-open')" aria-label="Buka menu">☰</button><span class="crumb">@yield('title','Dashboard')</span></div>
@@ -32,4 +34,5 @@
 @yield('content')
 </main></div></div>
 <script>document.addEventListener('click',e=>{if(window.innerWidth<780&&document.body.classList.contains('nav-open')&&!e.target.closest('#sideNav')&&!e.target.closest('.mobile-menu'))document.body.classList.remove('nav-open');});</script>
+<script src="{{ asset('assets/help.js') }}" defer></script>
 </body></html>

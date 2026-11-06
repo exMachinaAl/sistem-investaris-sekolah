@@ -27,8 +27,8 @@ class LaporanController {
             $out=fopen('php://output','w');fwrite($out,"\xEF\xBB\xBF");
             $write=static function(array $row)use($out){fputcsv($out,array_map([self::class,'safe'],$row),';');};
             if($jenis==='gedung'){
-                $write(['Kode','Nama','Jumlah Lantai','Jumlah Prasarana','Data Dummy','Keterangan']);
-                Gedung::withCount('prasarana')->orderBy('kode')->chunk(200,function($items)use($write){foreach($items as $x)$write([$x->kode,$x->nama,$x->jumlah_lantai,$x->prasarana_count,$x->is_dummy?'YA':'TIDAK',$x->keterangan]);});
+                $write(['Kode','Nama','Jumlah Lantai','Panjang Tapak (m)','Lebar Tapak (m)','Luas Tapak (m2)','Status Verifikasi','Tanggal Pengukuran','Sumber Ukuran','Jumlah Prasarana','Data Dummy','Keterangan']);
+                Gedung::withCount('prasarana')->orderBy('kode')->chunk(200,function($items)use($write){foreach($items as $x)$write([$x->kode,$x->nama,$x->jumlah_lantai,$x->panjang,$x->lebar,$x->luas_tapak,$x->status_verifikasi,$x->tanggal_pengukuran?->format('Y-m-d'),$x->sumber_ukuran,$x->prasarana_count,$x->is_dummy?'YA':'TIDAK',$x->keterangan]);});
             }elseif($jenis==='jurusan'){
                 $write(['Kode','Nama Jurusan','Jumlah Prasarana','Data Dummy']);
                 Jurusan::withCount('prasarana')->orderBy('kode')->chunk(200,function($items)use($write){foreach($items as $x)$write([$x->kode,$x->nama,$x->prasarana_count,$x->is_dummy?'YA':'TIDAK']);});

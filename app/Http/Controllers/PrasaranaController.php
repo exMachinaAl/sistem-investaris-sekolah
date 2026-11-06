@@ -9,6 +9,7 @@ use App\Models\Prasarana;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 class PrasaranaController {
     public function index(Request $request){
         $query=Prasarana::with(['gedung','jurusan'])->withCount('dokumentasiFoto');
@@ -37,23 +38,35 @@ class PrasaranaController {
     }
     private function rules(?Prasarana $item=null):array{
         return [
-            'kode'=>['required','string','max:30',Rule::unique('prasarana','kode')->ignore($item?->id)],
             'nama'=>['required','string','max:255'], 'kategori_sementara'=>['nullable','string','max:80'],
             'gedung_id'=>['nullable','integer','exists:gedung,id'],'lantai'=>['nullable','integer','min:0','max:100'],
-            'panjang'=>['nullable','numeric','min:0','max:999999'],'lebar'=>['nullable','numeric','min:0','max:999999'],
+            'panjang'=>['nullable','required_with:lebar','numeric','gt:0','max:999999'],'lebar'=>['nullable','required_with:panjang','numeric','gt:0','max:999999'],
             'keterangan_sumber'=>['nullable','string','max:10000'],'status_kepemilikan'=>['nullable','string','max:100'],
             'status_verifikasi'=>['required',Rule::in(['belum','terverifikasi','perlu_koreksi'])],
             'jurusan_ids'=>['array'],'jurusan_ids.*'=>['integer','distinct','exists:jurusan,id'],'is_dummy'=>['boolean'],
         ];
     }
+    private function ensureFloorMatchesBuilding(array $data):void{
+        if(($data['gedung_id']??null)===null && ($data['lantai']??null)!==null){
+            throw ValidationException::withMessages(['lantai'=>'Lantai hanya dapat diisi setelah gedung dipilih.']);
+        }
+        if(($data['gedung_id']??null)!==null && ($data['lantai']??null)!==null){
+            $jumlahLantai=Gedung::whereKey($data['gedung_id'])->value('jumlah_lantai');
+            if($jumlahLantai!==null && (int)$data['lantai']>(int)$jumlahLantai){
+                throw ValidationException::withMessages(['lantai'=>'Lantai ruang tidak boleh melebihi jumlah lantai gedung ('.$jumlahLantai.').']);
+            }
+        }
+    }
     public function store(Request $request){
         $data=$request->validate($this->rules());$ids=$data['jurusan_ids']??[];unset($data['jurusan_ids']);
+        $this->ensureFloorMatchesBuilding($data);
         $data['is_dummy']=$request->boolean('is_dummy');
         $prasarana=Prasarana::create($data);$prasarana->jurusan()->sync($ids);
         return redirect()->route('prasarana.show',$prasarana)->with('success','Prasarana berhasil ditambahkan.');
     }
     public function update(Request $request,Prasarana $prasarana){
         $data=$request->validate($this->rules($prasarana));$ids=$data['jurusan_ids']??[];unset($data['jurusan_ids']);
+        $this->ensureFloorMatchesBuilding($data);
         $data['is_dummy']=$request->boolean('is_dummy');
         $prasarana->update($data);$prasarana->jurusan()->sync($ids);
         return redirect()->route('prasarana.show',$prasarana)->with('success','Prasarana berhasil diperbarui.');
